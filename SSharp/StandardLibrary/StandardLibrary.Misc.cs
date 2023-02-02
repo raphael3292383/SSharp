@@ -30,6 +30,8 @@ namespace SSharp.StandardLibrary
         {
             int eC = (int)((VMNumber)arguments[0]).Value;
 
+            Console.WriteLine("Script exited with code " + eC);
+
             Environment.Exit(eC);
 
             return new VMNull();

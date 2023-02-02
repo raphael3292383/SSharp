@@ -23,6 +23,7 @@ namespace SSharp.StandardLibrary
             interpreter.DefineVariable("str", Stdlib_str, scope: null);
             interpreter.DefineVariable("num", Stdlib_num, scope: null);
             interpreter.DefineVariable("typeof", Stdlib_typeof, scope: null);
+            interpreter.DefineVariable("nbrequals", Stdlib_nbrequals, scope: null);
 
             // Maths
             interpreter.DefineVariable("floor", Stdlib_floor, scope: null);
