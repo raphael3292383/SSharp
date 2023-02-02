@@ -2,72 +2,7 @@
 
 S# include a (in dev state) desktop library with some useful functions for making desktop apps.
 
-## Variables
-### Backdrop types
-#### BDT_NONE : no backdrop
-#### BDT_AUTO : let DWM choose automatically
-#### BDT_MICA : Mica visual effect
-#### BDT_MICAALT : Mica Alt visual effect (also called Tabbed)
-#### BDT_ACRYLIC : Acrylic visual effect
-
-### Window messages
-#### WM_CREATE : first message sended by Windows (sended on window creation)
-#### WM_DESTROY : a message than is sended by Windows when you click on close button / when you press ALT+F4
-#### WM_PAINT : a message than is sended by Windows when the window needs to be repainted
-#### WM_COMMAND : a message than is sended by Windows when you click on a control
-
-## Functions
-
-### `SampleWinProc()`
-Sample window. Use it to test S# desktop capabilities.
-
-### `RegisterClass(string)`
-Register a class to be used in a window.
-
-The argument passed in the function is the class name.
-
-### `DefineWindowEvents()`
-Define a new WindowEvents class with link to functions to be called when Windows send a message.
-
-Returns the window events ID (also called weId)
-
-### `SubscribeWindowEvent(number weId, number eventMessage, string functionName)`
-Subscribe a function to a WindowEvents class by his weId
-
-Returns the window events ID
-
-### `CreateButton(number parentHwnd, string buttonName, number x, number y, number width, number height, number buttonId)`
-Create a button.
-
-To handle the button click event, add a ID to this button, subscribe a function to handle WM_COMMAND and check if the button ID is same as this button's ID
-
-If yes, do whatever you want.
-
-### `CreateWindow(number weId, string className, string windowName, number x, number y, number width, number height)`
-Create a window.
-
-Returns : the HWND of the created window, as number
-
-### `ShowWindow(number hwnd, number showWindowCommand)`
-Sets the visibility of a window.
-
-The first argument passed is the HWND (or Window Handle) of the window.
-The second argument passed is the show window command.
-
-Show window commands : https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showwindow 
-
-### `SetBackdropType(number hwnd, number backdrop)`
-Sets the backdrop for a window.
-
-NOTE : The BDT_NONE, BDT_AUTO, BDT_MICA, BDT_MICAALT and BDT_ACRYLIC variables can be used with the second argument to describe the backdrop
-
-### `SetDarkMode(number hwnd, bool setDarkMode)`
-Sets the immersive dark mode for a window (introduced in Windows 10 1903)
-
-### `MessageLoop(number)`
-Runs a basic Win32 message loop.
-
-The argument passed is the HWND (or Window Handle) of the window.
+This library is only compatible with Windows, so please go to the same file of the `windows` branch.
 
 # Standard library
 
