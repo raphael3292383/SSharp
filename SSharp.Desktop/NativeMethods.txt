@@ -11,6 +11,8 @@ GetModuleHandle
 CW_USEDEFAULT
 WM_CREATE
 WM_DESTROY
+WM_COMMAND
+LOWORD
 WM_PAINT
 PostQuitMessage
 HBRUSH
@@ -20,4 +22,8 @@ EndPaint
 COLOR_WINDOW
 RGB
 DestroyWindow
-BS_DEFPUSHBUTTON
+BUTTON_STYLE
+CreateWindow
+DwmExtendFrameIntoClientArea
+CreateSolidBrush
+InitCommonControlsEx

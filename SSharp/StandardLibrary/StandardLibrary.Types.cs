@@ -13,6 +13,16 @@ namespace SSharp.StandardLibrary
             return new VMString(arguments[0].ToString());
         });
 
+        private static VMNativeFunction Stdlib_nbrequals = new VMNativeFunction(
+        new List<string> { ("number"), ("number") },
+        (List<VMObject> arguments) =>
+        {
+            object o1 = ((VMNumber)arguments[0]).Value;
+            object o2 = ((VMNumber)arguments[1]).Value;
+
+            return new VMBoolean(o1 == o2);
+        });
+
         private static VMNativeFunction Stdlib_num = new VMNativeFunction(
         new List<string> { ("string") },
         (List<VMObject> arguments) =>
