@@ -2,13 +2,17 @@
 using SSharp.Tokens;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Reflection;
+using System.Threading;
 
 namespace SSharp.VM
 {
     public class Interpreter
     {
-        internal List<(string VariableName, VMObject Object, Block Scope)> Variables = new List<(string VariableName, VMObject Object, Block Scope)>();
+        internal List<(string VariableName, VMObject Object, Block Scope)> Variables = new();
+        internal List<VMNamespace> Namespaces = new();
+
         public List<VMLibrary> LoadedLibraries = new List<VMLibrary>();
 
         public bool LoadLibrary(VMLibrary lib)
@@ -24,7 +28,6 @@ namespace SSharp.VM
                 return false;
             }
         }
-
         public bool LoadLibrary(string LibPath)
         {
             try
@@ -50,6 +53,29 @@ namespace SSharp.VM
                 Console.WriteLine(ex);
                 return false;
             }
+        }
+
+        public Interpreter()
+        {
+            // for debug only
+            this.DefineVariable("listElemsFromNS", new VMNativeFunction(new List<string> { ("string") }, (List<VMObject> arguments) =>
+            {
+                VMNamespace n = GetNamespaceByName(((VMString)arguments[0]).Value);
+
+                if (n == null)
+                {
+                    throw new Exception($"Unknown namespace {((VMString)arguments[0]).Value}");
+                }
+                else
+                {
+                    for (int i = 0; i < n.Variables.Count; i++)
+                    {
+                        Console.WriteLine($"[{n.Variables[i].Object.ToString()}]    {n.Variables[i].VariableName}   {n.Variables[i].Object}");
+                    }
+                }
+
+                return new VMNull();
+            }), null);
         }
 
         public VMObject InterpretExpression(List<Token> tokens, Block scope)
@@ -190,39 +216,125 @@ namespace SSharp.VM
             return InterpretExpression(container.Tokens, scope);
         }
 
+        public VMNamespace DefineNamespace(string name)
+        {
+            if (String.IsNullOrEmpty(name))
+            {
+                throw new Exception("Namespace name cannot be null or empty.");
+            }
+            else if (name.Split('.').Length > 1)
+            {
+                throw new Exception("Namespaces cannot have subnamespaces");
+            }
+            else
+            {
+                var n = new VMNamespace(name);
+                Namespaces.Add(n);
+                return n;
+            }
+        }
+
+        public VMNamespace GetNamespaceByName(string name)
+        {
+            if (String.IsNullOrEmpty(name) || name.Split('.').Length > 1)
+                return null;
+            else
+                foreach (VMNamespace n in Namespaces) 
+                    if (n.NamespaceName == name)
+                        return n;
+            return null;
+                    
+        }
+
         public VMObject GetVariableByName(string name, Block scope)
         {
-            //Console.WriteLine("getv " + name);
-            foreach ((string VariableName, VMObject Object, Block Scope) variable in Variables)
+            string[] split = name.Split(".");
+
+            if (split.Length == 1)
             {
-                if (variable.VariableName == name)
+                // search in global variables
+                foreach ((string VariableName, VMObject Object, Block Scope) variable in Variables)
                 {
-                    if (variable.Scope == null || scope == null || scope == variable.Scope)
-                        return variable.Object;
-                    if (scope.IsDescendantOf(variable.Scope))
-                        return variable.Object;
+                    if (variable.VariableName == name)
+                    {
+                        if (variable.Scope == null || scope == null || scope == variable.Scope)
+                            return variable.Object;
+                        if (scope.IsDescendantOf(variable.Scope))
+                            return variable.Object;
+                    }
                 }
+                throw new Exception($"Unknown variable {name}.");
+
             }
-            throw new Exception($"Unknown variable {name}.");
+            else
+            {
+                // search in the namespace's variables
+                VMNamespace n = GetNamespaceByName(split[0]);
+
+                if (n != null)
+                {
+                    foreach ((string VariableName, VMObject Object, Block Scope) variable in n.Variables)
+                    {
+                        if (variable.VariableName == name)
+                        {
+                            if (variable.Scope == null || scope == null || scope == variable.Scope)
+                                return variable.Object;
+                            if (scope.IsDescendantOf(variable.Scope))
+                                return variable.Object;
+                        }
+                    }
+                    throw new Exception($"Unknown variable {name}.");
+                }
+                throw new Exception($"Unknown namespace {split[0]}");
+            }
         }
 
         public void DefineVariable(string name, VMObject obj, Block scope)
         {
-            //Console.WriteLine("defv " + name);
-            for (int i = 0; i < Variables.Count; i++)
+            string[] split = name.Split('.');
+
+            if (split.Length > 1)
             {
-                var item = Variables[i];
-                bool inScope = item.Scope == scope || scope == null || item.Scope == null || scope.IsDescendantOf(item.Scope);
-                if (item.VariableName == name && inScope)
+                VMNamespace n = GetNamespaceByName(split[0]);
+
+                if (n != null)
                 {
-                    // Update the variable.
-                    Variables[i] = (name, obj, item.Scope);
-                    return;
+                    for (int i = 0; i < n.Variables.Count; i++)
+                    {
+                        var item = n.Variables[i];
+                        bool inScope = item.Scope == scope || scope == null || item.Scope == null || scope.IsDescendantOf(item.Scope);
+                        if (item.VariableName == name && inScope)
+                        {
+                            // Update the variable.
+                            n.Variables[i] = (name, obj, item.Scope);
+                            return;
+                        }
+                    }
+                    n.Variables.Add((name, obj, scope));
+                }
+                else
+                {
+                    // Since we want to make a variable, why throw an exception when namespace doens't exists? So it will create a namespace with the same name & recall the function
+                    DefineNamespace(split[0]);
+                    DefineVariable(name,obj,scope);
                 }
             }
-            // Create the variable.
-            Variables.Add((name, obj, scope));
-            //Console.WriteLine($"VarDef {name} {obj}");
+            else
+            {
+                // define in global variables
+                for (int i = 0; i < Variables.Count; i++)
+                {
+                    var item = Variables[i];
+                    bool inScope = item.Scope == scope || scope == null || item.Scope == null || scope.IsDescendantOf(item.Scope);
+                    if (item.VariableName == name && inScope)
+                    {
+                        // Update the variable.
+                        Variables[i] = (name, obj, item.Scope);
+                        return;
+                    }
+                }
+                Variables.Add((name, obj, scope));
+            }
         }
 
         public VMObject CallFunctionByName(string name, List<VMObject> arguments, Block scope)

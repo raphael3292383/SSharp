@@ -11,8 +11,6 @@ namespace SSharp
 
         public void Start()
         {
-            Interpreter.LoadLibrary(new StandardLibrary.StandardLibrary());
-
             Console.Clear();
             Console.WriteLine("S# v0.9.9");
 
@@ -47,8 +45,8 @@ namespace SSharp
                     }
                 }
 
-                try
-                {
+                //try
+                //{
                     Script script = new Script(input);
 
                     script.Lex();
@@ -75,11 +73,11 @@ namespace SSharp
                     {
                         Interpreter.InterpretScript(script);
                     }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                }
+                //}
+                //catch (Exception e)
+                //{
+                //    Console.WriteLine(e.Message);
+                //}
             }
         }
     }
