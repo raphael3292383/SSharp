@@ -1,112 +1,14 @@
-# Desktop library
-
-S# include a (in dev state) desktop library with some useful functions for making desktop apps.
-
-This library is only compatible with Windows, so please go to the same file of the `windows` branch.
-
-# Standard library
-
-S# include a standard library with some useful functions for mathematics, type conversion and I/O and more!
-
-## I/O
-
-### `print(string)`
-Prints the passed string to the console.
-
-### `clear()`
-Clear the console
-
-### `readLine()`
-Return the user input in string format
-
-### `readKey()`
-Return the key than the user pressed
-
-### `setBackground(number background)`
-Sets a custom background color
-
-### `setForeground(number foreground)`
-Sets a custom foreground color
-
-## Mathematics
-
-### `floor(number)`
-Returns the floor of a number.
-
-### `round(number)`
-Rounds a number.
-
-### `ceil(number)`
-Returns the ceiling of a number.
-
-## Types
-
-### `str(number)`
-Convert a number to a string
-
-### `num(string)`
-Convert a string to a number
-
-### `typeof(object)`
-Return the type of an object as string
-
-## Misc
-
-### `exit(number)`
-Prints `Script exited with code <exitcode>` and exit the S# interpreter with the provided exit code.
-
-### `callScript(string)`
-Call/Run an external script
-
-## Library Manager
-
-### `import(string)`
-Imports a external managed DLL file made for S#
-
-# Threading library
-S# includes a (very buggy) threading library to run scripts in a thread.
-
-## Functions
-
-### `CreateThread(string script)`
-Create a thread with the provided script and returns the thread ID.
-
-### `StartThread(number threadId)`
-Starts a thread.
-
-### `StopThread(number threadId)`
-Stop a thread.
-
-
-# File Management library
-S# includes a file mto run scripts in a thread.
-
-## Functions
-
-### `GetFileContents(string file)`
-Returns the contents of a file
-
-### `SetFileContents(string file, string content)`
-Replaces the content of a file with the provided content
-
-### `FileExists(string file)`
-Returns a boolean to know if a file exists
-
-### `CreateFile(string file)`
-Create a file with the provided file path
-
-### `CopyFile(string file, string dest)`
-Copy a file with the provided file paths
-
-### `CopyFile(string file, string dest)`
-Move a file with the provided file paths
-
-### `EncryptFile(string file)`
-Should encrypt a file with AES encryption and returns the password...
-
-...but i didn't write the function yet
-
 # S# syntax
+
+## Namespaces
+Namespaces are like chests, but for storing variables & functions.
+
+You can declare a namespace by adding a variable into a non-existant namespace.
+
+```py
+# The namespace "sus" doens't exists yet. When the namespace isn't found, it will create it and add the variable into it.
+sus.v = 100
+```
 
 ## Functions
 
