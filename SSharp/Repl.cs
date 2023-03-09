@@ -9,8 +9,9 @@ namespace SSharp
     {
         public Interpreter Interpreter { get; } = new Interpreter();
 
-        public void Start()
+        public void Start(string stdLibPath)
         {
+            Interpreter.LoadLibrary(stdLibPath);
             Console.Clear();
             Console.WriteLine("S# v0.9.9");
 
@@ -44,40 +45,40 @@ namespace SSharp
                         }
                     }
                 }
+                Script script = new Script(input);
 
-                //try
-                //{
-                    Script script = new Script(input);
+                script.Lex();
 
-                    script.Lex();
-
-                    //script.RootToken.Debug();
-                    bool isExpression = true;
-                    foreach (Token token in script.RootToken.Tokens)
+                //script.RootToken.Debug();
+                bool isExpression = true;
+                foreach (Token token in script.RootToken.Tokens)
+                {
+                    if (token is Assignment || token is Block)
                     {
-                        if (token is Assignment || token is Block)
-                        {
-                            isExpression = false;
-                        }
+                        isExpression = false;
                     }
+                }
 
-                    if (isExpression)
+                if (isExpression)
+                {
+                    VMObject result = Interpreter.InterpretExpression(script.RootToken, script.RootToken);
+                    if (result != null && result is not VMNull)
                     {
-                        VMObject result = Interpreter.InterpretExpression(script.RootToken, script.RootToken);
-                        if (result != null && result is not VMNull)
-                        {
-                            Console.WriteLine(result.ToString());
-                        }
+                        Console.WriteLine(result.ToString());
                     }
-                    else
-                    {
-                        Interpreter.InterpretScript(script);
-                    }
-                //}
-                //catch (Exception e)
-                //{
-                //    Console.WriteLine(e.Message);
-                //}
+                }
+                else
+                {
+                    Interpreter.InterpretScript(script);
+                }
+                try
+                {
+                    
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
         }
     }

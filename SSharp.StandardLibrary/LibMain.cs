@@ -1,0 +1,19 @@
+﻿using SSharp.VM;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace SSharp.StandardLibrary
+{
+    public class LibMain
+    {
+        public void LoadLibrary(Interpreter i)
+        {
+            MainNamespace.Init(i);
+            MathNamespace.Init(i);
+            IONamespace.Init(i);
+        }
+    }
+}

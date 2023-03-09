@@ -18,7 +18,7 @@ namespace SSharp.VM
 
         public override string ToString()
         {
-            return "<VMObject BaseFunction>";
+            return "<VMBaseFunction>";
         }
 
         public override bool PassByReference()

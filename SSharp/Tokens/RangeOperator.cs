@@ -16,7 +16,7 @@ namespace SSharp.Tokens
             {
                 return new VMRange(numA.Value, numB.Value);
             }
-            throw new Exception($"Cannot instantiate a new range from {a.ToString()} and {b.ToString()}.");
+            throw new Exception($"Cannot instantiate a new range from {a.ToString()} to {b.ToString()}.");
         }
     }
 }

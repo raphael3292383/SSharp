@@ -12,6 +12,7 @@ namespace SSharp.VM
     {
         internal List<(string VariableName, VMObject Object, Block Scope)> Variables = new();
         internal List<VMNamespace> Namespaces = new();
+        internal List<VMNamespace> ImportedNamespaces = new();
 
         public List<VMLibrary> LoadedLibraries = new List<VMLibrary>();
 
@@ -57,7 +58,6 @@ namespace SSharp.VM
 
         public Interpreter()
         {
-            // for debug only
             this.DefineVariable("listElemsFromNS", new VMNativeFunction(new List<string> { ("string") }, (List<VMObject> arguments) =>
             {
                 VMNamespace n = GetNamespaceByName(((VMString)arguments[0]).Value);
@@ -72,6 +72,26 @@ namespace SSharp.VM
                     {
                         Console.WriteLine($"[{n.Variables[i].Object.ToString()}]    {n.Variables[i].VariableName}   {n.Variables[i].Object}");
                     }
+                }
+
+                return new VMNull();
+            }), null);
+            this.DefineVariable("load", new VMNativeFunction(new List<string> { ("string") }, (List<VMObject> arguments) =>
+            {
+                LoadLibrary(((VMString)arguments[0]).Value);
+                return new VMNull();
+            }), null);
+            this.DefineVariable("import", new VMNativeFunction(new List<string> { ("string") }, (List<VMObject> arguments) =>
+            {
+                VMNamespace n = GetNamespaceByName(((VMString)arguments[0]).Value);
+
+                if (n == null)
+                {
+                    throw new Exception($"Unknown namespace {((VMString)arguments[0]).Value}");
+                }
+                else
+                {
+                    ImportedNamespaces.Add(n);
                 }
 
                 return new VMNull();
@@ -263,6 +283,18 @@ namespace SSharp.VM
                             return variable.Object;
                     }
                 }
+
+                // search in all imported namespaces's variables
+                foreach (VMNamespace n in ImportedNamespaces)
+                {
+                    try
+                    {
+                        var v = n.GetVariableByName(name, scope);
+                        return v;
+                    }
+                    catch { }
+                }
+
                 throw new Exception($"Unknown variable {name}.");
 
             }
@@ -275,7 +307,7 @@ namespace SSharp.VM
                 {
                     foreach ((string VariableName, VMObject Object, Block Scope) variable in n.Variables)
                     {
-                        if (variable.VariableName == name)
+                        if (variable.VariableName == split[1])
                         {
                             if (variable.Scope == null || scope == null || scope == variable.Scope)
                                 return variable.Object;

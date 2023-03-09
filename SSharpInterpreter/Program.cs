@@ -21,6 +21,22 @@ namespace SSharpInterpreter
                         Script script = new Script(File.ReadAllText(args[0]));
                         script.Lex();
                         Interpreter interpreter = new Interpreter();
+                        if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "SSharp.StandardLibrary.dll"))
+                        {
+                            Console.WriteLine("Warning : The standard library DLL file is not in the interpreter directory. The script will be runned but it may get errors.");
+                        }
+                        else
+                        {
+                            interpreter.LoadLibrary(AppDomain.CurrentDomain.BaseDirectory + "SSharp.StandardLibrary.dll");
+                        }
+                        if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "SSharp.Desktop.dll"))
+                        {
+                            Console.WriteLine("Warning : The desktop library DLL file is not in the interpreter directory. The script will be runned but it may get errors.");
+                        }
+                        else
+                        {
+                            interpreter.LoadLibrary(AppDomain.CurrentDomain.BaseDirectory + "SSharp.Desktop.dll");
+                        }
                         interpreter.InterpretScript(script);
                     }
                     else
@@ -35,7 +51,7 @@ namespace SSharpInterpreter
             }
             else
             {
-                new SSharp.Repl().Start();
+                new SSharp.Repl().Start(AppDomain.CurrentDomain.BaseDirectory + "SSharp.StandardLibrary.dll");
             }
         }
     }
